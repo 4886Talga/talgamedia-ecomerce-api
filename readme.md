@@ -1,4 +1,4 @@
-# Ecommerce-API
+# Talga-Ecommerce-API
 
 A REST API for online e-commerce system
 
