@@ -1,0 +1,194 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider          = "mysql"
+    url               = env("DATABASE_URL")
+    shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+enum Role {
+    ADMIN
+    PUBLISHER
+    USER
+    ANONYMOUS
+}
+
+enum Status {
+    PREPARING
+    SHIPPED
+    DELIVERD
+}
+
+model User {
+    id                  String        @id @default(uuid())
+    userName            String?
+    password            String?
+    refreshToken        String?       @unique(length: 100) @db.LongText
+    resetPasswordToken  String?       @unique(length: 100) @db.LongText
+    email               String?       @unique
+    emailToken          String?       @unique // only used for short lived email tokens
+    emailValid          Boolean?      @default(false)
+    validateEmailExpire DateTime?
+    createdAt           DateTime      @default(now())
+    updatedAt           DateTime      @updatedAt
+    logged              Boolean       @default(false)
+    role                Role          @default(USER)
+    //Relation fields
+    profile             Profile?
+    order               Order[]
+    review              Review[]
+    transactions        Transactions?
+    receiver            Receiver[]
+    wishlist            Wishlist?
+    cart                Cart?
+}
+
+model Profile {
+    id        String  @id @unique @default(uuid())
+    firstName String?
+    lastName  String?
+    image     String?
+    mobile    String? @unique
+    address   String?
+    user      User    @relation(fields: [userId], references: [id])
+    userId    String  @unique
+}
+
+model Product {
+    id            String     @id @default(uuid())
+    name          String     @unique
+    price         Int
+    discount      Int
+    image         String
+    brand         String
+    countInStock  Int?
+    description   String
+    averageRating Decimal?   @default(0)
+    slug          String
+    sku           String
+    startsAt      DateTime?
+    endsAt        DateTime?
+    categories    Category[]
+    review        Review[]
+    wishlists     Wishlist[]
+    cartItems     CartItem[]
+}
+
+model Review {
+    id        String   @id @default(uuid())
+    title     String
+    year      Int
+    rating    Decimal
+    content   String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    product   Product  @relation(fields: [productId], references: [id])
+    productId String
+    user      User     @relation(fields: [userId], references: [id])
+    userId    String
+
+    @@unique([userId, productId])
+}
+
+model Wishlist {
+    id        String    @id @default(uuid())
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    products  Product[]
+    user      User      @relation(fields: [userId], references: [id])
+    userId    String    @unique
+}
+
+model Category {
+    id        String    @id @default(uuid())
+    name      String    @unique
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    products  Product[]
+}
+
+model Cart {
+    id        String     @id @default(uuid())
+    orderId   String?
+    order     Order?     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+    user      User       @relation(fields: [userId], references: [id])
+    userId    String     @unique
+    sum       Int?
+    createdAt DateTime   @default(now())
+    updatedAt DateTime   @updatedAt
+    items     CartItem[]
+}
+
+model CartItem {
+    id        String   @id @default(uuid())
+    product   Product  @relation(fields: [productId], references: [id])
+    productId String
+    quantity  Int
+    cart      Cart?    @relation(fields: [cartId], references: [id])
+    cartId    String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    Order     Order?   @relation(fields: [orderId], references: [id])
+    orderId   String?
+}
+
+model Order {
+    id                    String        @id @default(uuid())
+    orderdBy              User?         @relation(fields: [userId], references: [id])
+    userId                String
+    cart                  Cart[]
+    subTotal              Float
+    subtotalAfterDiscount Float
+    tax                   Float
+    shipping              Float
+    total                 Float
+    discount              Float
+    grandTotal            Float
+    transactions          Transactions?
+    tracking              TrackingInfo?
+    receiver              Receiver?
+    createdAt             DateTime      @default(now())
+    updatedAt             DateTime      @updatedAt
+    receiverId            String
+    CartItem              CartItem[]
+}
+
+model Receiver {
+    id         String @id @default(uuid())
+    firstName  String
+    lastName   String
+    mobile     String
+    email      String
+    address_1  String
+    address_2  String
+    postalCode Int
+    city       String
+    content    String
+    user       User   @relation(fields: [userId], references: [id])
+    userId     String @unique
+    orderId    String @unique
+    order      Order  @relation(fields: [orderId], references: [id])
+}
+
+model Transactions {
+    id        String   @id @default(uuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    user      User     @relation(fields: [userId], references: [id])
+    userId    String   @unique
+    status    String
+    amount    Int
+    orderId   String   @unique
+    order     Order    @relation(fields: [orderId], references: [id])
+}
+
+model TrackingInfo {
+    id        String   @id @unique @default(uuid())
+    orderId   String   @unique
+    order     Order    @relation(fields: [orderId], references: [id])
+    address   String
+    status    Status   @default(PREPARING)
+    updatedAt DateTime @default(now())
+}

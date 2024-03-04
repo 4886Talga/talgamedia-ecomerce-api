@@ -1,0 +1,56 @@
+{
+  "name": "flowers-api",
+  "version": "1.0.0",
+  "description": "Rest API about flowers",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js",
+    "prisma:migrate": "npx prisma migrate dev --name update-models --create-only",
+    "prisma:deploy": "npx prisma migrate deploy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "talgamedia-flowers-api"
+  },
+  "keywords": [
+    "flowers",
+    "bouquets",
+    "roses"
+  ],
+  "author": "talgamedia",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^5.8.1",
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "cloudinary": "^1.41.3",
+    "config": "^3.3.10",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "googleapis": "^131.0.0",
+    "joi": "^17.12.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.8.0",
+    "nodemailer": "^6.9.8",
+    "nodemon": "^3.0.3",
+    "prisma-dbml-generator": "^0.12.0",
+    "redis": "^4.6.12",
+    "stripe": "^14.13.0",
+    "swagger-ui-express": "^5.0.0"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js",
+    "schema": "./prisma/schema.prisma"
+  },
+  "devDependencies": {
+    "prisma": "^5.8.1"
+  }
+}
