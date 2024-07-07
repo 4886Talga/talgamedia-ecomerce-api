@@ -13,12 +13,13 @@ const {
 const router = express.Router();
 
 router.post("/auser", userController.regauser);
-router.post("/sign-up", validateUserSignUp, userController.signup);
+// router.post("/sign-up", validateUserSignUp, userController.signup);
+router.post("/register", validateUserSignUp, userController.handleNewUser);
 router.post("/board-user", userController.boardUser);
 router.get("/verify/:token", userController.verifyEmail);
-router.post("/login", validateUser, userController.login);
+router.post("/login", validateUser, userController.handleLogin);
 router.get("/me", authorizeAccess, userController.getMe);
-router.get("/refresh", userController.refresh);
+router.get("/refresh", userController.handleRefreshToken);
 router.post("/logout", userController.logout);
 router.post(
   "/forgotpassword",

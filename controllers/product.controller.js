@@ -7,6 +7,8 @@ const {
   productStockUpdate,
   productUpdate,
   removeProduct,
+  fetchProductsByIds,
+  fetchProductBySlug,
 } = require("../services/productService");
 const { Conflict, NotFound } = require("../utils/errorResponse");
 
@@ -27,14 +29,13 @@ async function getAllProducts(req, res, next) {
       search,
       currentPage: actualPage,
     } = req.query;
-    const itemsPerPage = items > count ? PER_PAGE : items;
-    const query = req.query;
+    const itemsPerPage = items ? items : PER_PAGE;
     const currentPage = Math.max(Number(actualPage || 1), 1);
 
     /** @type { import('@prisma/client').Prisma.ProductFindManyArgs} */
     const options = {
-      take: itemsPerPage ? Number(itemsPerPage) : PER_PAGE,
-      skip: (currentPage - 1) * PER_PAGE,
+      take: Number(itemsPerPage),
+      skip: (currentPage - 1) * itemsPerPage,
       orderBy: {
         name: "asc",
       },
@@ -43,7 +44,7 @@ async function getAllProducts(req, res, next) {
       },
     };
 
-    if (search) {
+    if (search && search !== "") {
       options.where = {
         description: {
           contains: search,
@@ -67,20 +68,38 @@ async function getAllProducts(req, res, next) {
 
     const products = await fetchProductsWithPagination(options);
 
+    const amountFetchedProducts = products.length;
     const prodFrase = products.length < 2 ? "product" : "products";
-    const finalPage = Math.ceil(count / PER_PAGE);
+    const finalPage = Math.ceil(amountFetchedProducts / items);
     const nextPage = Math.min(currentPage + 1, finalPage);
     const prevPage = Math.max(currentPage - 1, 0);
 
     res.status(200).json({
       message: `${products.length} ${prodFrase} fetched succesfully!`,
-      data: products,
+      filteredProducts: products,
       count,
       finalPage,
       nextPage,
       prevPage,
-      items,
-      currentPage: currentPage,
+      currentPage,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function getProductsByIds(req, res, next) {
+  try {
+    const { ids } = req.params;
+    const productIds = ids.split(",");
+    const products = await fetchProductsByIds(productIds);
+
+    if (!products) throw new NotFound("Products not found");
+
+    res.status(200).json({
+      success: true,
+      message: "Products fetched succesfully!",
+      products: products,
     });
   } catch (error) {
     next(error);
@@ -120,6 +139,24 @@ async function getProduct(req, res, next) {
         fetchedProduct: singleProduct,
       });
     }
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function getProductBySlug(req, res, next) {
+  try {
+    const { slug } = req.params;
+
+    const singleProduct = await fetchProductBySlug(slug);
+
+    if (!singleProduct) throw new NotFound("Product not found");
+
+    res.status(200).json({
+      success: true,
+      message: "Single product fetched succesfully!",
+      fetchedProduct: singleProduct,
+    });
   } catch (error) {
     next(error);
   }
@@ -185,7 +222,9 @@ module.exports = {
   createNewProduct,
   getProduct,
   getAllProducts,
+  getProductsByIds,
   deleteProduct,
   updateProduct,
   updateProductStock,
+  getProductBySlug,
 };

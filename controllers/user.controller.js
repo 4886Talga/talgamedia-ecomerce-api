@@ -59,14 +59,14 @@ const verifyEmail = async (req, res, next) => {
     res.status(201).json({
       success: true,
       message: `${confirmedUser.email} confirmed succesfully!`,
-      //data: confirmedUser.userId,
+      data: confirmedUser,
     });
   } catch (error) {
     next(error);
   }
 };
-
-async function signup(req, res, next) {
+// handling of a new user with email verification
+/* async function signup(req, res, next) {
   try {
     const { userName, email, password } = req.body;
 
@@ -106,7 +106,33 @@ async function signup(req, res, next) {
   } catch (error) {
     next(error);
   }
-}
+} */
+
+const handleNewUser = async (req, res, next) => {
+  try {
+    const { userName, email, password } = req.body;
+    if (!userName | !password)
+      return res
+        .status(400)
+        .json({ message: " Username and password are required." });
+
+    const user = await fetchUserByEmail(email);
+
+    if (user) {
+      throw new BadRequest("User already has an account");
+    }
+
+    const hashedPassword = await generateHashedPassword(password);
+    const newUser = await createUser(userName, email, hashedPassword);
+    console.log(newUser);
+    res.status(201).json({
+      success: true,
+      message: `New user ${newUser.userName} created!`,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 async function boardUser(req, res, next) {
   try {
@@ -191,8 +217,13 @@ async function regauser(req, res, next) {
   }
 }
 
-async function login(req, res) {
+async function handleLogin(req, res) {
   const { email, password } = req.body;
+  if (!email | !password)
+    return res
+      .status(400)
+      .json({ message: " Username and password are required." });
+
   const user = await fetchUserByEmail(email);
 
   if (!user || !(await compareHashedPassword(password, user.password))) {
@@ -219,7 +250,7 @@ async function login(req, res) {
   });
 }
 
-async function refresh(req, res, next) {
+async function handleRefreshToken(req, res, next) {
   const cookies = req.cookies;
 
   if (!cookies?.jwt) {
@@ -505,8 +536,9 @@ async function updateUserPassword(req, res, next) {
 }
 
 module.exports = {
-  signup,
-  login,
+  //signup,
+  handleNewUser,
+  handleLogin,
   getAllUsers,
   getMe,
   forgotPassword,
@@ -517,7 +549,7 @@ module.exports = {
   updateUserByAdmin,
   deleteUserByAdmin,
   verifyEmail,
-  refresh,
+  handleRefreshToken,
   logout,
   regauser,
   boardUser,

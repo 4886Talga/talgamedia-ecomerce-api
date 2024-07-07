@@ -64,9 +64,9 @@ model Product {
     image         String
     brand         String
     countInStock  Int?
-    description   String
+    description   String     @db.Text
     averageRating Decimal?   @default(0)
-    slug          String
+    slug          String     @unique
     sku           String
     startsAt      DateTime?
     endsAt        DateTime?

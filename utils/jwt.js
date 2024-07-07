@@ -1,8 +1,3 @@
-// redis ttl and jwt ttl for verify -> describe
-// passwordResetSecret + oldPassword -> abr redis er ttl thakbe ki na
-
-// write -> refresh token ttl === refresh token redis key ttl, checking -> how?
-
 const { sign, verify } = require("jsonwebtoken");
 const config = require("config");
 

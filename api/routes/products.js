@@ -13,7 +13,9 @@ const router = express.Router();
 router.use("/:productId/reviews", reviewRouter);
 
 router.get("/", productsController.getAllProducts);
-router.get("/:productId", authorizeAccess, productsController.getProduct);
+router.get("/:productId", productsController.getProduct);
+router.get("/product/:slug", productsController.getProductBySlug);
+router.get("/multi/:ids", productsController.getProductsByIds);
 router.post(
   "/",
   authorizeAccess,

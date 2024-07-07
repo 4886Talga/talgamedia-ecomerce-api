@@ -18,6 +18,18 @@ const fetchProduct = async (productId) => {
   });
 };
 
+const fetchProductBySlug = async (slug) => {
+  return await Product.findFirst({
+    where: {
+      slug: slug,
+    },
+    include: {
+      categories: { select: { name: true } },
+      review: true,
+    },
+  });
+};
+
 const fetchProductsWithPagination = async (options) => {
   let products;
 
@@ -38,6 +50,17 @@ const fetchProductForCart = async (productId) => {
     },
   });
 };
+
+async function fetchProductsByIds(ids) {
+  const products = await Product.findMany({
+    where: {
+      id: {
+        in: ids,
+      },
+    },
+  });
+  return products;
+}
 
 const fetchProductForReview = async (productId) => {
   return await Product.findUnique({
@@ -98,5 +121,7 @@ module.exports = {
   fetchProductForCart,
   fetchProductForReview,
   fetchProductForWishlist,
+  fetchProductsByIds,
   removeProduct,
+  fetchProductBySlug,
 };
