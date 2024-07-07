@@ -16,19 +16,9 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install dependencies
-        run: |
-          npm install
-
       - name: Deploy to cPanel via FTP
         uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_NAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          exclude: |
-            .git*
-            node_modules/
-            .github/
-            .env
-            package-lock.json
