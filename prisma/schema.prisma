@@ -35,7 +35,6 @@ model User {
     updatedAt           DateTime      @updatedAt
     logged              Boolean       @default(false)
     role                Role          @default(USER)
-    //Relation fields
     profile             Profile?
     order               Order[]
     review              Review[]
