@@ -43,6 +43,8 @@ model User {
     receiver            Receiver[]
     wishlist            Wishlist?
     cart                Cart?
+
+    @@map("user")
 }
 
 model Profile {
@@ -54,6 +56,8 @@ model Profile {
     address   String?
     user      User    @relation(fields: [userId], references: [id])
     userId    String  @unique
+
+    @@map("profile")
 }
 
 model Product {
@@ -74,6 +78,8 @@ model Product {
     review        Review[]
     wishlists     Wishlist[]
     cartItems     CartItem[]
+
+    @@map("product")
 }
 
 model Review {
@@ -90,6 +96,7 @@ model Review {
     userId    String
 
     @@unique([userId, productId])
+    @@map("review")
 }
 
 model Wishlist {
@@ -99,6 +106,8 @@ model Wishlist {
     products  Product[]
     user      User      @relation(fields: [userId], references: [id])
     userId    String    @unique
+
+    @@map("wishlist")
 }
 
 model Category {
@@ -107,6 +116,8 @@ model Category {
     createdAt DateTime  @default(now())
     updatedAt DateTime  @updatedAt
     products  Product[]
+
+    @@map("category")
 }
 
 model Cart {
@@ -119,6 +130,8 @@ model Cart {
     createdAt DateTime   @default(now())
     updatedAt DateTime   @updatedAt
     items     CartItem[]
+
+    @@map("cart")
 }
 
 model CartItem {
@@ -132,6 +145,8 @@ model CartItem {
     updatedAt DateTime @updatedAt
     Order     Order?   @relation(fields: [orderId], references: [id])
     orderId   String?
+
+    @@map("cartitem")
 }
 
 model Order {
@@ -153,6 +168,8 @@ model Order {
     updatedAt             DateTime      @updatedAt
     receiverId            String
     CartItem              CartItem[]
+
+    @@map("order")
 }
 
 model Receiver {
@@ -170,6 +187,8 @@ model Receiver {
     userId     String @unique
     orderId    String @unique
     order      Order  @relation(fields: [orderId], references: [id])
+
+    @@map("receiver")
 }
 
 model Transactions {
@@ -182,6 +201,8 @@ model Transactions {
     amount    Int
     orderId   String   @unique
     order     Order    @relation(fields: [orderId], references: [id])
+
+    @@map("transactions")
 }
 
 model TrackingInfo {
@@ -191,4 +212,6 @@ model TrackingInfo {
     address   String
     status    Status   @default(PREPARING)
     updatedAt DateTime @default(now())
+
+    @@map("trackinginfo")
 }
