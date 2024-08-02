@@ -73,7 +73,7 @@ model Product {
     sku           String
     startsAt      DateTime?
     endsAt        DateTime?
-    categories    Category[]
+    categories    Category[] @relation(map: "_categorytoproduct")
     review        Review[]
     wishlists     Wishlist[]
     cartItems     CartItem[]
@@ -114,7 +114,7 @@ model Category {
     name      String    @unique
     createdAt DateTime  @default(now())
     updatedAt DateTime  @updatedAt
-    products  Product[]
+    products  Product[] @relation(map: "_categorytoproduct")
 
     @@map("category")
 }
