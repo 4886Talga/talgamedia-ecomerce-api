@@ -60,20 +60,20 @@ model Profile {
 }
 
 model Product {
-    id            String     @id @default(uuid())
-    name          String     @unique
+    id            String              @id @default(uuid())
+    name          String              @unique
     price         Int
     discount      Int
     image         String
     brand         String
     countInStock  Int?
-    description   String     @db.Text
-    averageRating Decimal?   @default(0)
-    slug          String     @unique
+    description   String              @db.Text
+    averageRating Decimal?            @default(0)
+    slug          String              @unique
     sku           String
     startsAt      DateTime?
     endsAt        DateTime?
-    categories    Category[] @relation(map: "_categorytoproduct")
+    categories    CategoryOnProduct[]
     review        Review[]
     wishlists     Wishlist[]
     cartItems     CartItem[]
@@ -110,13 +110,23 @@ model Wishlist {
 }
 
 model Category {
-    id        String    @id @default(uuid())
-    name      String    @unique
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @updatedAt
-    products  Product[] @relation(map: "_categorytoproduct")
+    id        String              @id @default(uuid())
+    name      String              @unique
+    createdAt DateTime            @default(now())
+    updatedAt DateTime            @updatedAt
+    products  CategoryOnProduct[]
 
     @@map("category")
+}
+
+model CategoryOnProduct {
+    productId  String
+    categoryId String
+    product    Product  @relation(fields: [productId], references: [id])
+    category   Category @relation(fields: [categoryId], references: [id])
+
+    @@id([productId, categoryId])
+    @@map("_categorytoproduct")
 }
 
 model Cart {
