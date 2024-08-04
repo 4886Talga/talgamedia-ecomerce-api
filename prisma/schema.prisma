@@ -120,12 +120,12 @@ model Category {
 }
 
 model CategoryOnProduct {
-    productId  String
-    categoryId String
-    product    Product  @relation(fields: [productId], references: [id])
-    category   Category @relation(fields: [categoryId], references: [id])
+    A        String
+    B        String
+    product  Product  @relation(fields: [A], references: [id])
+    category Category @relation(fields: [B], references: [id])
 
-    @@id([productId, categoryId])
+    @@id([A, B])
     @@map("_categorytoproduct")
 }
 
