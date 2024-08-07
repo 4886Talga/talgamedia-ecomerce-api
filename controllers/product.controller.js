@@ -40,7 +40,13 @@ async function getAllProducts(req, res, next) {
         name: "asc",
       },
       include: {
-        categories: { select: { name: true } },
+        categories: {
+          include: {
+            category: {
+              select: { name: true },
+            },
+          },
+        },
       },
     };
 
@@ -60,7 +66,9 @@ async function getAllProducts(req, res, next) {
       options.where = {
         categories: {
           some: {
-            name: category,
+            category: {
+              name: category,
+            },
           },
         },
       };
